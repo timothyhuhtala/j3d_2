@@ -84,7 +84,46 @@ class Inventory:
                 if slot.get("qty", 1) > 1:
                     screen.blit(font.render(str(slot["qty"]), True, (255, 255, 255)), (sx + 40, sy + 40))
         
-        # Simple hover text
+        # --- ENHANCED HOVER TOOLTIP ---
         hovered = self.get_slot_at(mouse_pos)
         if hovered is not None and self.slots[hovered]:
-            screen.blit(font.render(self.slots[hovered]["name"], True, (255, 215, 0)), (mouse_pos[0]+10, mouse_pos[1]+10))
+            slot = self.slots[hovered]
+            mx, my = mouse_pos
+            
+            # Build tooltip text
+            tooltip_lines = [slot["name"]]
+            
+            # Add type and quantity
+            if slot.get("qty", 1) > 1:
+                tooltip_lines.append(f"Qty: {slot['qty']}")
+            
+            # Add stats for consumables
+            if slot.get("health", 0) > 0:
+                tooltip_lines.append(f"+{slot['health']} HP")
+            if slot.get("mana", 0) > 0:
+                tooltip_lines.append(f"+{slot['mana']} Mana")
+            
+            # Add description
+            if slot.get("desc"):
+                tooltip_lines.append(slot["desc"])
+            
+            # Calculate tooltip box size
+            small_font = pygame.font.SysFont("georgia", 12)
+            line_height = 18
+            tooltip_width = max(150, max([small_font.size(line)[0] for line in tooltip_lines]) + 20)
+            tooltip_height = len(tooltip_lines) * line_height + 16
+            
+            # Position tooltip (offset from cursor, keep on screen)
+            tooltip_x = min(mx + 15, sw - tooltip_width - 10)
+            tooltip_y = min(my + 15, sh - tooltip_height - 10)
+            
+            # Draw tooltip box
+            tooltip_rect = pygame.Rect(tooltip_x, tooltip_y, tooltip_width, tooltip_height)
+            pygame.draw.rect(screen, (40, 40, 45), tooltip_rect)
+            pygame.draw.rect(screen, (200, 180, 100), tooltip_rect, 2)
+            
+            # Draw tooltip text
+            for i, line in enumerate(tooltip_lines):
+                color = (200, 180, 100) if i == 0 else (220, 220, 220)  # Title in gold
+                text_surf = small_font.render(line, True, color)
+                screen.blit(text_surf, (tooltip_x + 10, tooltip_y + 8 + i * line_height))
