@@ -83,6 +83,10 @@ class Inventory:
                 if icon: screen.blit(pygame.transform.scale(icon, (50, 50)), (sx + 5, sy + 5))
                 if slot.get("qty", 1) > 1:
                     screen.blit(font.render(str(slot["qty"]), True, (255, 255, 255)), (sx + 40, sy + 40))
+                
+                # Highlight equipped weapons with a bright border
+                if slot.get("equipped") and slot.get("type") == "weapon":
+                    pygame.draw.rect(screen, (255, 215, 0), s_rect, 3)
         
         # --- ENHANCED HOVER TOOLTIP ---
         hovered = self.get_slot_at(mouse_pos)
@@ -96,6 +100,13 @@ class Inventory:
             # Add type and quantity
             if slot.get("qty", 1) > 1:
                 tooltip_lines.append(f"Qty: {slot['qty']}")
+            
+            # Add equipment status for weapons
+            if slot.get("type") == "weapon":
+                if slot.get("equipped"):
+                    tooltip_lines.append("[EQUIPPED]")
+                else:
+                    tooltip_lines.append("[Right-click to equip]")
             
             # Add stats for consumables
             if slot.get("health", 0) > 0:
@@ -124,6 +135,11 @@ class Inventory:
             
             # Draw tooltip text
             for i, line in enumerate(tooltip_lines):
-                color = (200, 180, 100) if i == 0 else (220, 220, 220)  # Title in gold
+                if "[EQUIPPED]" in line:
+                    color = (100, 255, 100)  # Green for equipped
+                elif "[Right-click" in line:
+                    color = (200, 180, 100)  # Gold for hint
+                else:
+                    color = (200, 180, 100) if i == 0 else (220, 220, 220)  # Title in gold
                 text_surf = small_font.render(line, True, color)
                 screen.blit(text_surf, (tooltip_x + 10, tooltip_y + 8 + i * line_height))
