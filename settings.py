@@ -66,3 +66,6 @@ ARTIFACT_PATH = "artifact.png"
 FIREBALL_PATH = "fireball.png"
 ENEMY_GHOST_PATH = "ghost_enemy_1.png"
 MAP_DATA_FILE = "map_data.json"
+
+# --- Cracked Wall Health ---
+CRACKED_WALL_HP = 50  # Health points for destructible cracked walls
